@@ -11,6 +11,7 @@
 // 图形扩展
 // 运动系统
 // 调试
+// 数据管理
 // 
 // 
 // 
@@ -62,6 +63,9 @@
 	
 	// 保存所有图形的编码（在图形库里的名字）
 	var G_SHAPE_INDEX_DATA = [];// 以便获知第几次画了哪个形状
+
+	// 临时的样式设置
+	var G_TEMP_CONFIG = null;
 	
 	// 解决的问题
 	// 第五次画了哪个形状？
@@ -105,6 +109,31 @@
 	// ---------------------------------------------------------
 	// ---------------------------------------------------------
 	// ---------------------------------------------------------
+	function applyStyle(){// applyStyle.call(ctx);
+		// 应用临时样式
+		var style = G_TEMP_CONFIG;
+		
+		if(!style){
+			return true;
+		}
+
+		// boxShadow
+		// backgroundColor
+		// border
+		// fontStyle
+
+		// 可以应用css方法设置，也可以应用原生canvas方法设置
+		
+		// 遍历所有的属性，并设置ctx
+		// this.fillStyle = "";
+		// 一些列属性值设置
+		// 
+		// 
+		// 
+
+		// 使用完了之后重置
+		G_TEMP_CONFIG = null;
+	}
 	// 画一个点
 	function drawDot(x, y, r, fill){
 		this.beginPath();
@@ -241,11 +270,24 @@
 			yMax: h
 		};
 
+		// 基本信息
+		this.info = {
+			author: "Pelli",
+			email: "pelli_mail@163.com"
+		};
+
+		this.start = (new Date()).getTime();
+
+		// 距离现在多久了
+		this.sofar = function(){
+			return (new Date()).getTime - this.start;
+		};
+
 		// 内部事件
 		var _this = this;
 
 		g_event_all.forEach(function(item, index, arr){
-			
+
 			// 在canvas上绑定事件，
 			// 当事件发生的时候，判断事件发生的区域是否在这个图形的区域内
 			// 如果是，则表示这个图形发生了事件
@@ -288,7 +330,11 @@
 
 		var ctx = _this.ctx;
 
+		ctx.save();
+		// 应用临时样式
+		applyStyle.call(ctx);
 		drawDot.call(ctx, x, y, r, true);
+		ctx.restore();
 
 		var data = {
 			name: "dot",
@@ -337,7 +383,11 @@
 		var _this = this;
 		var ctx = _this.ctx;
 
+		ctx.save();
+		// 应用临时样式
+		applyStyle.call(ctx);
 		drawLine.call(ctx, x1, y1, x2, y2);
+		ctx.restore();
 		
 		var relativeArr = putLineInCenter(x1, y1, x2, y2);
 
@@ -382,7 +432,11 @@
 		var _this = this;
 		var ctx = _this.ctx;
 
+		ctx.save();
+		// 应用临时样式
+		applyStyle.call(ctx);
 		drawDashline.call(ctx, x1, y1, x2, y2, r, dis);
+		ctx.restore();
 		
 		// 设置相对位置
 		var relativeArr = putLineInCenter(x1, y1, x2, y2);
@@ -443,7 +497,11 @@
 		var _this = this;
 		var ctx = _this.ctx;
 
+		ctx.save();
+		// 应用临时样式
+		applyStyle.call(ctx);
 		drawRect.call(ctx, x, y, width, height, fill);
+		ctx.restore();
 
 		var data = {
 			name: "rect",
@@ -490,7 +548,11 @@
 		var _this = this;
 		var ctx = _this.ctx;
 
+		ctx.save();
+		// 应用临时样式
+		applyStyle.call(ctx);
 		drawDot.call(ctx, x, y, r, fill);
+		ctx.restore();
 
 		var data = {
 			name: "circle",
@@ -534,8 +596,9 @@
 	};
 
 
-	Shape.prototype.config = function(obj){
-		// 配置项
+	Shape.prototype.style = function(obj){
+		// 配置项, 设置样式
+		G_TEMP_CONFIG = obj;
 	};
 
 	// 事件,自定义事件,显式添加事件
@@ -719,7 +782,6 @@
 			in: data.in,
 			image: function(type){// jpg, jpeg, png, gif
 				// 生成一个只包含该形状的base64 image图像
-				// var img1 = new Image();
 				var _this = this;
 				var shapeName = _this.name;
 
@@ -1013,10 +1075,17 @@
 		w = w ? w/1 : 300;
 		h = h ? h/1 : 150;
 
-		if(!isNaN(w) && !isNaN(h)){
-			// 如果是数字
+		if(!isNaN(w)){
 			c.width = w;
+		}else{
+			c.width = 300;
+		}
+
+		if(!isNaN(h)){
+			// 如果是数字
 			c.height = h;
+		}else{
+			c.height = 150;
 		}
 
 		var ctx = c.getContext("2d");
