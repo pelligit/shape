@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>图形库</title>
+	<link rel="stylesheet" type="text/css" href="css/shape.css">
+	<style type="text/css">
+		body{
+			margin: 0;
+			padding: 0;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="c" width="500" height="500"></canvas>
+	
+	<script type="text/javascript" src="js/shape.js"></script>
+
+	<script type="text/javascript">
+		var canvas = document.getElementById("c");
+		var sp = new Shape(canvas);
+
+		console.log(sp);
+
+		var dt = sp.dot(30, 40, 5);
+		console.log(dt);
+
+		// 对一个圆添加点击事件
+		dt.on("click", function(e){
+			console.log("这个图形触发了事件");
+			console.log(e);
+		});
+
+		// 上面的事件绑定，被这个事件绑定覆盖了，还需要管理一个回调函数栈
+		dt.click(function(e){
+			console.log("直接点击这个东西");
+		});
+
+		// 画一条线
+		var line = sp.line(200, 100, 400, 123);
+
+		// 画一条虚线
+		var dash = sp.dashline(30, 20, 400, 300, 2, 50);
+		console.log(dash);
+		// 生成一个只有这个形状的图片
+		console.log(dash.image());
+
+		// 画一个圆
+		var yuan = sp.circle(50, 90, 40);
+		console.log(yuan);
+
+		// 绑定事件
+		yuan.on("click", function(e){
+			console.log("这个圆被点击了");
+		});
+
+		var img = yuan.image();
+		console.log(img);
+
+		// 绑定事件
+		yuan.on("mousemove", function(e){
+			console.log("鼠标在这个圆上");
+		});
+
+		var square = sp.rect(200, 200, 150, 200, false);
+		console.log(square.image());
+	</script>
+</body>
+</html>
