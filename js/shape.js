@@ -96,6 +96,9 @@
 
 	var G_PATH_DATA = {};
 
+	// 用户页面中的canvas，目前这只是只有一个canvas的情况，如果有多个canvas呢
+	var UserCanvas = null;
+
 	// ---------------------------------------------------------
 	// ---------------------------------------------------------
 	// ---------------------------------------------------------
@@ -285,6 +288,7 @@
 
 		// 内部事件
 		var _this = this;
+		UserCanvas = _this;
 
 		g_event_all.forEach(function(item, index, arr){
 
@@ -643,6 +647,17 @@
 		// 画布的背景
 	};
 
+	Shape.prototype.clear = function(){
+		var _this = this;
+
+		var x = this.range.xMin;
+		var w = this.range.xMax;
+		var y = this.range.yMin;
+		var h = this.range.yMax;
+
+		this.ctx.clearRect(x, y, w, h);
+	};
+
 	// 两个画布相互变换图形
 
 
@@ -777,6 +792,24 @@
 			},
 			remove: function(){
 				// 移除这个形状
+				// 直接删除的话，它所覆盖的形状怎么办？
+				
+				// G_SHAPE_INDEX_DATA.splice();// 将这个序号的直接删除，然后重回整个canvas
+				G_SHAPE_INDEX_DATA.splice(this._shapeIndex, 1);
+				// G_SHAPE_DATA.splice(this._shapeIndex, 1);
+				delete G_SHAPE_DATA[this._shapeIndex];
+				
+				
+				// 清除整个canvas
+				UserCanvas.clear();
+
+				// 重绘整个形状
+				G_SHAPE_INDEX_DATA.forEach(function(item, index, arr){
+					// 遍历，重绘
+					// 将形状数据库里面的每个形状全部重新绘制一遍
+					G_SHAPE_DATA[item].reset();
+				});
+
 				return this;
 			},
 			in: data.in,
@@ -869,6 +902,10 @@
 
 				var _this = this;
 
+				// 重绘了这个图形
+				// 但是
+				UserCanvas[_this.name].apply(UserCanvas, _this.params);
+
 				// 这样虽然能重新画一下，但是，数据库里面的index却变了，而且还新增了一个形状
 				// 正常来说，图形重画了，但是数据库里面没有多数据，叫这个名字的形状依然还是在
 				// Shape.prototype[_this.name].apply(_this, _this.params);// 画完之后，
@@ -912,6 +949,7 @@
 				// 通常是在经过了变换之后使用该方法
 				// 比如通过动画之后，位置改变了
 				// 可以使用这个方法变为最开始时候的样子
+				console.log(this._shapeIndex);
 			},
 			mirror: function(x1, y1, x2, y2){
 				// 镜像变换
